@@ -1,0 +1,62 @@
+#!/usr/bin/env python
+import rospy
+import time
+from sensor_msgs.msg import Joy
+from xycar_msgs.msg import xycar_motor
+
+
+xbox_axes = [0 for _ in range(8)]
+motor_control = xycar_motor()
+pub = rospy.Publisher('xycar_motor', xycar_motor, queue_size=1)
+
+def cb(data):
+    global xbox_axes
+    rospy.loginfo(f'{data.axes[2]:5.2f}, {data.axes[5]:5.2f}, {data.axes[0]:5.2f}')
+    xbox_axes = data.axes
+
+
+def motor_pub(angle, speed): 
+    global pub
+    global motor_control
+
+    motor_control.angle = angle
+    motor_control.speed = speed
+
+    pub.publish(motor_control)
+
+def constrain(input, low, high):
+    if input < low:
+      input = low
+    elif input > high:
+      input = high
+    else:
+      input = input
+
+    return int(input)
+
+def talker():
+    PracticeMode = 1
+    rospy.init_node('xycar_joy')
+    rospy.Subscriber("/joy", Joy, cb)
+
+    rate = rospy.Rate(200) # 10hz
+    while not rospy.is_shutdown():
+        if xbox_axes[2] != 1.0:
+            speed = int((-xbox_axes[2] + 1)*-30)
+            speed = constrain(speed, -20, 0)
+        elif xbox_axes[5] != 1.0:
+            speed = int((-xbox_axes[5] + 1)*30 * PracticeMode)
+            speed = constrain(speed,0, 20 * PracticeMode )
+        else:  
+            speed = 0
+        angle = int(xbox_axes[0]*-25)
+        # print(f'speed:{speed}, angle: {angle}')
+        motor_pub(angle, speed)
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        talker()
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
