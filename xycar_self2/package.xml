@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>xycar_self2</name>
+  <version>0.1.0</version>
+  <description>ICELAP package</description>
+
+  <maintainer email="icelap@icelap.icelap">ICELAP</maintainer>
+  <license>BSD</license>
+  <url type="website">https://icelab.dankook.ac.kr</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+</package>

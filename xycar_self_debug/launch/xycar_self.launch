@@ -1,0 +1,39 @@
+<launch>
+
+  <arg name="motor_type" default="0" />
+  <arg name="angle_offset" default="0" />
+  
+  <group unless="$(arg motor_type)">
+    <include file="$(find vesc_driver)/launch/vesc_drive_xycar_motor.launch" />
+  </group>
+  
+  <!-- xycar_motor node 실행 -->
+  <node pkg="xycar_motor" type="xycar_motor.py" name="xycar_motor" output="screen" >
+    <param name="motor_type" value="$(arg motor_type)" />
+    <param name="angle_offset" value="$(arg angle_offset)" />
+  </node>
+  <!-- xycar_ultrasonic node 실행 -->
+  <node pkg="xycar_ultrasonic" type="xycar_ultrasonic.py" name="xycar_ultrasonic" output="screen" />
+
+
+
+
+  <!-- usb_cam node 실행 -->
+  
+  <node pkg="usb_cam" type="usb_cam_node" name="usb_cam" output="screen" >
+    <param name="video_device" value="/dev/videoCAM" />
+    <param name="autoexposure" value="false" />
+    <param name="exposure" value="160" />
+    <param name="image_width" value="1280" />
+    <param name="image_height" value="640" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="io_method" value="mmap" />
+    <param name="camera_name" value="usb_cam" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="camera_info_url" value="file://$(find usb_cam)/calibration/usb_cam.yaml" />
+  </node>
+
+  <!-- xycar_joy node 실행 -->
+  <node name="xycar_self" pkg="xycar_self" type="NewDriving.py" output="screen"/>
+  
+</launch>
